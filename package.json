@@ -1,7 +1,7 @@
 {
   "name": "reversible-key-map",
   "version": "1.0.0",
-  "description": "",
+  "description": "A double reversible key map using classic JS Map",
   "main": "build/ReversibleKeyMap.js",
   "scripts": {
     "publish-patch": "tsc && tsc -d && git commit -am 'Patch publish' && npm version patch && npm publish",
@@ -9,5 +9,10 @@
     "publish-major": "tsc && tsc -d && git commit -am 'Major publish' && npm version major && npm publish"
   },
   "author": "Louis Béranger",
-  "license": "ISC"
+  "license": "CC BY-SA 4.0",
+  "repository": "https://github.com/alkihis/reversible-key-map",
+  "bugs": "https://github.com/alkihis/reversible-key-map/issues",
+  "keywords": [
+    "map", "keys", "reversible", "double"
+  ]
 }
