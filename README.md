@@ -33,7 +33,7 @@ const other_map = new ReversibleKeyMap<HTMLElement, HTMLElement, Function>();
 other_map.set(document.getElementById('hello'), document.getElementById('other-click'), myEventListener);
 ```
 
-The number of keys allowed is unlimited and their order is relevant.
+The number of keys allowed is unlimited and their order is not relevant.
 
 To install the package, use:
 ```bah
