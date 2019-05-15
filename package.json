@@ -1,6 +1,6 @@
 {
   "name": "reversible-key-map",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A double reversible key map using classic JS Map",
   "main": "build/ReversibleKeyMap.js",
   "scripts": {
