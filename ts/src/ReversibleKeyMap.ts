@@ -11,7 +11,7 @@
  * @template T
  */
 export default class ReversibleKeyMap<K1, K2, T> {
-    protected map: Map<K1 | K2, Map<K1 | K2, T>> = new Map;
+    protected data: Map<K1 | K2, Map<K1 | K2, T>> = new Map;
 
     constructor(it?: Iterable<[[K1, K2], T]>);
     constructor(it?: Iterable<[[K2, K1], T]>);
@@ -43,7 +43,7 @@ export default class ReversibleKeyMap<K1, K2, T> {
      * @memberof ReversibleKeyMap
      */
     getAllFrom(k1: K1 | K2) : Map<K1 | K2, T> {
-        return this.map.get(k1);
+        return this.data.get(k1);
     }
 
     get(k1: K1, k2: K2) : T;
@@ -58,7 +58,7 @@ export default class ReversibleKeyMap<K1, K2, T> {
      * @memberof ReversibleKeyMap
      */
     get(k1: K1 | K2, k2: K1 | K2) : T {
-        return this.map.has(k1) ? this.map.get(k1).get(k2) : undefined;
+        return this.data.has(k1) ? this.data.get(k1).get(k2) : undefined;
     }
 
     set(k1: K1, k2: K2, value: T) : this;
@@ -73,20 +73,20 @@ export default class ReversibleKeyMap<K1, K2, T> {
      * @memberof ReversibleKeyMap
      */
     set(k1: K1 | K2, k2: K1 | K2, value: T) : this {
-        if (this.map.has(k1)) {
-            this.map.get(k1).set(k2, value);
+        if (this.data.has(k1)) {
+            this.data.get(k1).set(k2, value);
         }
         else {
-            this.map.set(k1, new Map([
+            this.data.set(k1, new Map([
                 [k2, value]
             ]));
         }
 
-        if (this.map.has(k2)) {
-            this.map.get(k2).set(k1, value);
+        if (this.data.has(k2)) {
+            this.data.get(k2).set(k1, value);
         }
         else {
-            this.map.set(k2, new Map([
+            this.data.set(k2, new Map([
                 [k1, value]
             ]));
         }
@@ -102,7 +102,7 @@ export default class ReversibleKeyMap<K1, K2, T> {
      * @memberof ReversibleKeyMap
      */
     has(k1: K1 | K2) : boolean {
-        return this.map.has(k1);
+        return this.data.has(k1);
     }
 
     hasCouple(k1: K1, k2: K2) : boolean;
@@ -116,8 +116,8 @@ export default class ReversibleKeyMap<K1, K2, T> {
      * @memberof ReversibleKeyMap
      */
     hasCouple(k1: K1 | K2, k2: K1 | K2) : boolean {
-        if (this.map.has(k1)) {
-            return this.map.get(k1).has(k2);
+        if (this.data.has(k1)) {
+            return this.data.get(k1).has(k2);
         }
         return false;
     }
@@ -128,11 +128,11 @@ export default class ReversibleKeyMap<K1, K2, T> {
      * @memberof ReversibleKeyMap
      */
     clear() : void {
-        this.map.clear();
+        this.data.clear();
     }
 
     /**
-     * Delete everythinh linked to key k1.
+     * Delete everything linked to key k1.
      *
      * @param {K1 | K2} k1
      * @returns {this}
@@ -160,18 +160,18 @@ export default class ReversibleKeyMap<K1, K2, T> {
      */
     delete(k1: K1 | K2, k2: K1 | K2) : this {
         if (this.hasCouple(k1 as K1, k2 as K2)) {
-            const k1map = this.map.get(k1);
+            const k1map = this.data.get(k1);
             k1map.delete(k2);
 
             if (k1map.size === 0) {
-                this.map.delete(k1);
+                this.data.delete(k1);
             }
 
-            const k2map = this.map.get(k2);
+            const k2map = this.data.get(k2);
             k2map.delete(k1);
 
             if (k2map.size === 0) {
-                this.map.delete(k2);
+                this.data.delete(k2);
             }
         }
 
@@ -182,7 +182,7 @@ export default class ReversibleKeyMap<K1, K2, T> {
         // Enregistre les couples déjà visités
         const couples = new Map<K1 | K2, Set<K1 | K2>>();
         
-        for (const [key1, map] of this.map.entries()) {
+        for (const [key1, map] of this.data.entries()) {
             if (!couples.has(key1)) {
                 couples.set(key1, new Set);
             }
@@ -231,7 +231,7 @@ export default class ReversibleKeyMap<K1, K2, T> {
      * @memberof ReversibleKeyMap
      */
     keys() : IterableIterator<K1 | K2> {
-        return this.map.keys();
+        return this.data.keys();
     }
 
     /**
@@ -261,6 +261,37 @@ export default class ReversibleKeyMap<K1, K2, T> {
     }
 
     /**
+     * See Array.map 
+     *
+     * @param {((keys: [K1|K2, K1|K2], value: T) => T)} callback
+     */
+    map(callback: (keys: [K1|K2, K1|K2], value: T) => T) {
+        const copy = new ReversibleKeyMap;
+
+        for (const [keys, value] of this) {
+            copy.set(keys[0], keys[1], callback(keys, value));
+        }
+
+        return copy as ReversibleKeyMap<K1, K2, T>;
+    }
+
+    /**
+     * See Array.filter 
+     *
+     * @param {((keys: [K1|K2, K1|K2], value: T) => T)} callback
+     */
+    filter(callback: (keys: [K1|K2, K1|K2], value: T) => boolean) {
+        const copy = new ReversibleKeyMap;
+
+        for (const [keys, value] of this) {
+            if (callback(keys, value))
+                copy.set(keys[0], keys[1], value);
+        }
+
+        return copy as ReversibleKeyMap<K1, K2, T>;
+    }
+
+    /**
      * Get map size using the KEYS. Warning, it count EVERY key. 
      * It means that one `set("a", "b", val)` will produce a result of `2`.
      * 0(1) complexity.
@@ -269,7 +300,7 @@ export default class ReversibleKeyMap<K1, K2, T> {
      * @memberof ReversibleKeyMap
      */
     get size() {
-        return this.map.size;
+        return this.data.size;
     }
 
     /**

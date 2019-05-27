@@ -43,7 +43,7 @@ $ npm install reversible-key-map
 
 ## Usage
 
-Main method are `get`, `set`, `getAllFrom`, `has` and `hasCouple`.
+Main methods are `get`, `set`, `getAllFrom`, `has` and `hasCouple`.
 
 ### Instanciation
 ```ts
@@ -303,7 +303,7 @@ ___
 
 ▸ **deleteAllFrom**(k1: *`K1` \| `K2`*): `this`
 
-Delete everythinh linked to key k1.
+Delete everything linked to key k1.
 
 **Parameters:**
 
